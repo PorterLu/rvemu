@@ -2,7 +2,6 @@
 #include "rvemu.h"
 
 int main(int argc, char *argv[]) {
-    printf("Hello, World\n");
     assert(argc > 1);
 
     machine_t machine = {0};
