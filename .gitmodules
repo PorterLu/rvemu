@@ -1,0 +1,3 @@
+[submodule "benchmark-dhrystone"]
+	path = benchmark-dhrystone
+	url = git@github.com:sifive/benchmark-dhrystone.git
