@@ -42,6 +42,15 @@ static void mmu_load_segment(mmu_t *mmu, elf64_phdr_t *phdr, int fd) {
   // transfer flag in ELF to flag in PAGE
   int prot = flags_to_mmap_prot(phdr->p_flags);
 
+  /**
+   * void *mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset)
+   * addr: the virtual address that will be mapped
+   * length: map length
+   * prot: protection mode
+   * flags: map type
+   * fd: file handler
+   * offset: file offset
+  */
   // mapping the address of this segment
   u64 addr = (u64)mmap((void*)aligned_vaddr, filesz, prot, MAP_PRIVATE | MAP_FIXED,
                         fd, ROUNDDOWN(offset, page_size));
@@ -104,6 +113,7 @@ u64 mmu_alloc(mmu_t *mmu, i64 sz) {
   mmu->alloc += sz;
   assert(mmu->alloc >= mmu->base);
 
+  // two cases: increase host_alloc or decrease host_alloc
   if (sz > 0 && mmu->alloc > TO_GUEST(mmu->host_alloc)) {
     if (mmap((void *)mmu->host_alloc, ROUNDUP(sz, page_size), 
                                 PROT_READ | PROT_WRITE, 

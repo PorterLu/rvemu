@@ -75,6 +75,7 @@ static u64 sys_unimplemented(machine_t *m) {
     fatalf("unimplemented syscall: %lu", machine_get_gp_reg(m, a7));
 }
 
+// transfer guest syscall to host syscall
 static u64 sys_exit(machine_t *m) {
     GET(a0, code);
     exit(code);
@@ -202,6 +203,7 @@ static syscall_t syscall_table[] = {
     [SYS_chdir] =          sys_unimplemented,
 };
 
+// as old syscall number is too big, we divide sycall number into two arrays.
 static syscall_t old_syscall_table[] = {
     [-OLD_SYSCALL_THRESHOLD + SYS_open] =   sys_open,
     [-OLD_SYSCALL_THRESHOLD + SYS_link] =   sys_unimplemented,

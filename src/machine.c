@@ -35,12 +35,14 @@ void machine_load_program(machine_t *m, char *prog) {
 void machine_setup(machine_t *m, int argc, char *argv[]) {
   size_t stack_size = 32 * 1024 * 1024;
   u64 stack = mmu_alloc(&m->mmu, stack_size);
+  // apply a region for stack
   m->state.gp_regs[sp] = stack + stack_size;
 
   m->state.gp_regs[sp] -= 8; //auxv
   m->state.gp_regs[sp] -= 8; //envp
   m->state.gp_regs[sp] -= 8; //argv end
 
+  // initialize stack content
   u64 args = argc - 1;
   for(int i = args; i > 0; i--) {
     size_t len = strlen(argv[i]);
