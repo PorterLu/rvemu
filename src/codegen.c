@@ -1121,5 +1121,71 @@ str_t machine_genblock(machine_t *m) {
     source = tracer_append_epilogue(&tracer, source);
     source = str_append(source, CODEGEN_EPILOGUE);
 
+    printf("%s\n", source);
+    fatal("");
     return source;
 }
+
+/** dhrystone example:
+#include <stdint.h>
+#include <stdbool.h>
+#define OFFSET 0x088800000000ULL               
+#define TO_HOST(addr) (addr + OFFSET)          
+enum exit_reason_t {                           
+   none,                                       
+   direct_branch,                              
+   indirect_branch,                            
+   interp,                                     
+   ecall,                                      
+};                                             
+typedef union {                                
+    uint64_t v;                                
+    uint32_t w;                                
+    double d;                                  
+    float f;                                   
+} fp_reg_t;                                    
+typedef struct {                               
+    enum exit_reason_t exit_reason;            
+    uint64_t reenter_pc;                       
+    uint64_t gp_regs[32];                      
+    fp_reg_t fp_regs[32];                      
+    uint64_t pc;                               
+    uint32_t fcsr;                             
+} state_t;                                     
+void start(volatile state_t *restrict state) {
+    // put variables on the stack, which facilitates clang to optimitize the code 
+    uint64_t x1 = state->gp_regs[1];
+    uint64_t x10 = state->gp_regs[10];
+    uint64_t x11 = state->gp_regs[11];
+    uint64_t x12 = state->gp_regs[12];
+insn_10830: {
+    uint64_t rs1 = x10;
+    x10 = (int64_t)(int32_t)(rs1 + (int64_t)2LL);
+    goto insn_10832;
+}
+insn_10832: {
+    uint64_t rs1 = x11;
+    uint64_t rs2 = x10;
+    x11 = (int64_t)(int32_t)(rs1 + rs2);
+    goto insn_10834;
+}
+insn_10834: {
+    uint64_t rs1 = x12;
+    uint64_t rs2 = x11;
+    *(uint32_t *)TO_HOST(rs1 + (int64_t)0LL) = (uint32_t)rs2;
+    goto insn_10836;
+}
+// for uncertain branch
+insn_10836: {
+    uint64_t rs1 = x1;
+    state->exit_reason = indirect_branch;
+    state->reenter_pc = (rs1 + (int64_t)0LL) & ~(uint64_t)1;
+    goto end;
+}
+end:;
+    state->gp_regs[1] = x1;
+    state->gp_regs[10] = x10;
+    state->gp_regs[11] = x11;
+    state->gp_regs[12] = x12;
+}
+*/
